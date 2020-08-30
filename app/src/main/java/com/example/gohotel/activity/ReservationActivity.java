@@ -160,8 +160,97 @@ public class ReservationActivity extends AppCompatActivity implements ChooseRoom
                 .placeholder(R.drawable.loading_big)
                 .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop();
 
+        gethotelDetail();
+        getRoomHotel();
     }
 
+    private void gethotelDetail() {
+        GoHotelApplication.serviceApi.getHotelDetail(hotelId).enqueue(new Callback<List<HotelForm>>() {
+            @Override
+            public void onResponse(Call<List<HotelForm>> call, Response<List<HotelForm>> response) {
+                if (response.code() == 200) {
+                    List<HotelForm> hotelForms = response.body();
+                    if (hotelForms != null && hotelForms.size() > 0) {
+                        handleDataHotel(hotelForms.get(0));
+                    }
+                } else {
+                    Toast.makeText(ReservationActivity.this, "Không thể lấy thông tin khách sạn", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<List<HotelForm>> call, Throwable t) {
+            }
+        });
+    }
+
+    private void handleDataHotel(HotelForm hotelForm) {
+        tvHotelName.setText(hotelForm.getNameHotel());
+        tvCheckIn.setText(hotelForm.getCheckIn() + ":00");
+        tvCheckOut.setText(hotelForm.getCheckOut() + ":00");
+    }
+
+    private void initRcvRoom() {
+        rcvListRoom.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        rcvListRoom.setHasFixedSize(true);
+        if (roomTypeForms != null && roomTypeForms.size() != 0) {
+            ChooseRoomTypeListAdapter roomTypeListAdapter = new ChooseRoomTypeListAdapter(this, roomTypeForms, this);
+            rcvListRoom.setAdapter(roomTypeListAdapter);
+            roomTypeListAdapter.notifyDataSetChanged();
+            if (roomTypeListAdapter != null) {
+                roomTypeListAdapter.updatePotitionChoose(roomtypeIndex);
+            }
+        }
+    }
+
+    private void getRoomHotel() {
+        GoHotelApplication.serviceApi.getRoomTypeHotel(hotelId).enqueue(new Callback<List<RoomTypeForm>>() {
+            @Override
+            public void onResponse(Call<List<RoomTypeForm>> call, Response<List<RoomTypeForm>> response) {
+
+                if (response.code() == 200) {
+                    List<RoomTypeForm> roomTypeForms = response.body();
+                    if (roomTypeForms != null && roomTypeForms.size() > 0) {
+                        handleRoomTypeHotel(roomTypeForms);
+                        initRcvRoom();
+                    }
+                } else {
+                    Toast.makeText(ReservationActivity.this, "Không thể lấy danh sách phòng", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<List<RoomTypeForm>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void handleRoomTypeHotel(List<RoomTypeForm> roomTypeForms) {
+        this.roomTypeForms = roomTypeForms;
+        for (RoomTypeForm roomTypeForm : roomTypeForms) {
+            if (roomTypeForm.getId() == roomId) {
+                Glide.with(this)
+                        .load(R.drawable.bananahotel).apply(options).into(imgRoom);
+                tvRoomName.setText(roomTypeForm.getName());
+                tvHotelFee.setText(String.format("%s VND", Utils.formatCurrency(roomTypeForm.getPricePerDay())));
+                hotelFee = roomTypeForm.getPricePerDay();
+            }
+
+        }
+    }
+
+    private void visibleBottomRoomType(int visible) {
+        if (visible == View.VISIBLE) {
+            Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
+            layoutBkTranfer.setVisibility(View.VISIBLE);
+            bottomsheet.startAnimation(slideUp);
+            bottomsheet.setVisibility(View.VISIBLE);
+        } else {
+            Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_down);
+            layoutBkTranfer.setVisibility(View.GONE);
+            bottomsheet.startAnimation(slideUp);
+            bottomsheet.setVisibility(View.GONE);
+        }
+    }
 
 
     public interface DialogCallback {
