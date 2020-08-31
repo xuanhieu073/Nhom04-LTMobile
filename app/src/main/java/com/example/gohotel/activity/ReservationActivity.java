@@ -267,6 +267,40 @@ public class ReservationActivity extends AppCompatActivity implements ChooseRoom
         });
     }
 
+     private void bookRoom() {
+         String timeBook = AppTimeUtils.getSystemDay(new SimpleDateFormat(AppTimeUtils.yyyyMMddHHmmss));
+         GoHotelApplication.serviceApi.bookRoom(GoHotelApplication.DEVICE_ID,hotelId, roomId, AppTimeUtils.changeDateUpToServer(startDate), AppTimeUtils.changeDateUpToServer(endDate), hotelFee, timeBook, "0374080167", "", PreferenceUtils.getToken(this)).enqueue(new Callback<BookRes>() {
+             @Override
+             public void onResponse(Call<BookRes> call, Response<BookRes> response) {
+                 if (response.code() == 200) {
+                     BookRes bookRes = response.body();
+                     if (bookRes.getResult() != 0) {
+                         showDialogReservationSuccessful(ReservationActivity.this, new DialogCallback() {
+                             @Override
+                             public void finished() {
+                                 gotoBookingDetail(bookRes.getResult());
+                                 finish();
+                             }
+                         });
+                     } else {
+                         Toast.makeText(ReservationActivity.this, bookRes.getMessage(), Toast.LENGTH_SHORT).show();
+                     }
+                 } else {
+                     Toast.makeText(ReservationActivity.this, "Đặt phòng không thành công", Toast.LENGTH_SHORT).show();
+                 }
+             }
+
+             @Override
+             public void onFailure(Call<BookRes> call, Throwable t) {
+             }
+         });
+     }
+
+     private void gotoBookingDetail(int result) {
+         Intent intent = new Intent(ReservationActivity.this, BookingDetail.class);
+         intent.putExtra("BookingID", result);
+         startActivity(intent);
+     }
 
     @Override
     public void resultRoomType(RoomTypeForm roomTypeForm, int potition) {
@@ -289,6 +323,29 @@ public class ReservationActivity extends AppCompatActivity implements ChooseRoom
             bottomsheet.setVisibility(View.GONE);
         }
     }
+
+     public static void showDialogReservationSuccessful(Context context, final DialogCallback dialogCallback) {
+         if (context instanceof Activity && !((Activity) context).isFinishing()) {
+             final Dialog dialog = new Dialog(context, R.style.dialog_full_transparent_background);
+             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+             dialog.setContentView(R.layout.booking_successful_dialog);
+             Window window = dialog.getWindow();
+             if (window != null) {
+                 WindowManager.LayoutParams wlp = window.getAttributes();
+                 wlp.gravity = Gravity.CENTER;
+                 window.setAttributes(wlp);
+                 dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+                 dialog.setCancelable(false);
+                 dialog.show();
+             }
+
+             TextView btnUnderstand = dialog.findViewById(R.id.btnUnderstand);
+             btnUnderstand.setOnClickListener(v -> {
+                 dialogCallback.finished();
+                 dialog.dismiss();
+             });
+         }
+     }
 
     public interface DialogCallback {
         void finished();
