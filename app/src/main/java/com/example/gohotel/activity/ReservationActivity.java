@@ -161,6 +161,7 @@ public class ReservationActivity extends AppCompatActivity implements ChooseRoom
                 .diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop();
 
         gethotelDetail();
+        getImageHotel();
         getRoomHotel();
     }
 
@@ -189,6 +190,7 @@ public class ReservationActivity extends AppCompatActivity implements ChooseRoom
         tvCheckOut.setText(hotelForm.getCheckOut() + ":00");
     }
 
+
     private void initRcvRoom() {
         rcvListRoom.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         rcvListRoom.setHasFixedSize(true);
@@ -206,7 +208,6 @@ public class ReservationActivity extends AppCompatActivity implements ChooseRoom
         GoHotelApplication.serviceApi.getRoomTypeHotel(hotelId).enqueue(new Callback<List<RoomTypeForm>>() {
             @Override
             public void onResponse(Call<List<RoomTypeForm>> call, Response<List<RoomTypeForm>> response) {
-
                 if (response.code() == 200) {
                     List<RoomTypeForm> roomTypeForms = response.body();
                     if (roomTypeForms != null && roomTypeForms.size() > 0) {
@@ -219,7 +220,6 @@ public class ReservationActivity extends AppCompatActivity implements ChooseRoom
             }
             @Override
             public void onFailure(Call<List<RoomTypeForm>> call, Throwable t) {
-
             }
         });
     }
@@ -238,6 +238,44 @@ public class ReservationActivity extends AppCompatActivity implements ChooseRoom
         }
     }
 
+    private void getImageHotel() {
+        GoHotelApplication.serviceApi.getImageHotel(hotelId).enqueue(new Callback<List<HotelImageForm>>() {
+            @Override
+            public void onResponse(Call<List<HotelImageForm>> call, Response<List<HotelImageForm>> response) {
+                if (response.code() == 200) {
+                    List<HotelImageForm> hotelImageForms = response.body();
+                    if (hotelImageForms != null && hotelImageForms.size() > 0) {
+                        RequestOptions requestOptions = new RequestOptions()
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .placeholder(R.drawable.loading_big)
+                                .error(R.drawable.loading_big);
+                        Glide.with(ReservationActivity.this)
+                                .load(hotelImageForms.get(0).getNameImage())
+                                .apply(requestOptions)
+                                .transition(withCrossFade())
+                                .into(imgHotel);
+                    }
+                } else {
+                    Toast.makeText(ReservationActivity.this, "Không thể lấy hình khách sạn", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<HotelImageForm>> call, Throwable t) {
+
+            }
+        });
+    }
+
+
+    @Override
+    public void resultRoomType(RoomTypeForm roomTypeForm, int potition) {
+        this.roomId = roomTypeForm.getId();
+        this.roomtypeIndex = potition;
+        handleRoomTypeHotel(roomTypeForms);
+        visibleBottomRoomType(View.GONE);
+    }
+
     private void visibleBottomRoomType(int visible) {
         if (visible == View.VISIBLE) {
             Animation slideUp = AnimationUtils.loadAnimation(this, R.anim.slide_up);
@@ -251,7 +289,6 @@ public class ReservationActivity extends AppCompatActivity implements ChooseRoom
             bottomsheet.setVisibility(View.GONE);
         }
     }
-
 
     public interface DialogCallback {
         void finished();
