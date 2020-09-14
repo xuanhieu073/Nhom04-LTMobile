@@ -78,18 +78,61 @@ public class ChooseAreaActivity extends AppCompatActivity {
         });
     }
 
+    private void handleListCity(List<CityForm> cityForms) {
+        //chọn thành phố đứng đầu
+        cityForms.get(0).setClicked(true);
+        // city dùng để xác định thành phố nào dc chọn
+        city = cityForms.get(0);
+        provinceAdapter = new ProvinceAdapter(this, cityForms, cityForm -> {
+            //onclick
+            // lấy danh sách quận huyện
+            getDistrict(cityForm.getKey());
+            provinceAdapter.notifyDataSetChanged();
+            city = cityForm;
+        });
+        lvProvinces.setAdapter(provinceAdapter);
+        getDistrict(cityForms.get(0).getKey());
+    }
+
     private void handleListDistrict(List<DistrictForm> districtForms) {
         // xử lý danh sách quận huyện
         districtAdapter = new DistrictAdapter(this, districtForms, new DistrictAdapter.OnItemClick() {
 
             @Override
             public void onClick(DistrictForm districtForm) {
-               
+                // onclick
+                district = districtForm;
+                // bắt adater khi nó thay đổi
+                districtAdapter.notifyDataSetChanged();
             }
         });
         lvHotelArea.setAdapter(districtAdapter);
     }
 
+    private void getDistrict(int provine) {
+        // api để lấy quận huyện
+        DialogLoadingProgress.getInstance().show(this);
+        GoHotelApplication.serviceApi.accordingToCityId(provine).enqueue(new Callback<List<DistrictForm>>() {
+            @Override
+            public void onResponse(Call<List<DistrictForm>> call, Response<List<DistrictForm>> response) {
+                DialogLoadingProgress.getInstance().hide();
+
+                if (response.code() == 200) {
+                    List<DistrictForm> districtForms = response.body();
+                    if (districtForms != null && districtForms.size() > 0) {
+                        handleListDistrict(districtForms);
+                    }
+                } else {
+                    Toast.makeText(ChooseAreaActivity.this, "Không thể lấy danh sách thành phố", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<DistrictForm>> call, Throwable t) {
+                DialogLoadingProgress.getInstance().hide();
+
+            }
+        });
     }
 
     // ánh xạ layout để xử lý
