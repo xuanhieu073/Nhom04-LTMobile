@@ -10,9 +10,9 @@ import android.widget.TextView;
 
 import com.example.gohotel.R;
 import com.example.gohotel.model.HotelForm;
-
 import java.util.List;
 
+<!--Create by: Khoa-->
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
     private Context context;
     private List<HotelForm> hotelForms;
