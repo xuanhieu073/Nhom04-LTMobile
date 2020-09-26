@@ -46,7 +46,8 @@ public class BookingList extends AppCompatActivity {
         super.onResume();
         getMyBooking();
     }
-
+	<!--Create by: Tan-->
+	<!--Description: getMyBooking-->
     private void getMyBooking() {
         //danh sách booking
         DialogLoadingProgress.getInstance().show(this);
