@@ -164,7 +164,8 @@ public class ReservationActivity extends AppCompatActivity implements ChooseRoom
         getImageHotel();
         getRoomHotel();
     }
-
+<!--Create by: Khoa-->
+<!-- Description: gethotelDetail -->
     private void gethotelDetail() {
         GoHotelApplication.serviceApi.getHotelDetail(hotelId).enqueue(new Callback<List<HotelForm>>() {
             @Override
