@@ -88,7 +88,15 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     progressBar.setVisibility(View.VISIBLE);
                     rcvSearchHotel.setVisibility(View.GONE);
                 } else {
-                   
+                    /*Show Icon*/
+                    hotelForms = new ArrayList<>();
+                    progressBar.setVisibility(View.GONE);
+
+                    /*Show RecyclerView*/
+                    rcvSearchHotel.setVisibility(View.VISIBLE);
+                    rcvSearchHotel.setAdapter(new SearchAdapter(SearchActivity.this, hotelForms));
+                    //findRecommend();
+                    offset = 0;
 
                     //findRecommend();
                 }
