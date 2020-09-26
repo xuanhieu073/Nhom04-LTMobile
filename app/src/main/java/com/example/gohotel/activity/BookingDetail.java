@@ -57,7 +57,8 @@ public class BookingDetail extends AppCompatActivity {
             getBookingDetail();
         }
     }
-
+	<!--Create by: Tan-->
+	<!-- Description: checkInBooking -->
     private void checkInBooking() {
         DialogLoadingProgress.getInstance().show(this);
 
