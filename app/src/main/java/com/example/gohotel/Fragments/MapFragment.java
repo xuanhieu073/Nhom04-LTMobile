@@ -1,4 +1,4 @@
-package com.example.gohotel.Fragments;
+package com.example.nhom4.Fragments;
 
 import android.Manifest;
 import android.app.Activity;
@@ -28,19 +28,20 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.gohotel.GoHotelApplication;
-import com.example.gohotel.R;
-import com.example.gohotel.activity.ChooseAreaActivity;
-import com.example.gohotel.adapter.HotelMapAdapter;
-import com.example.gohotel.dialog.DialogLoadingProgress;
-import com.example.gohotel.gps.GeoCodeService;
-import com.example.gohotel.model.HotelForm;
-import com.example.gohotel.model.MarkerWrapper;
-import com.example.gohotel.utils.AddressResultReceiver;
-import com.example.gohotel.utils.ParamConstants;
-import com.example.gohotel.utils.PreferenceUtils;
-import com.example.gohotel.utils.TextOnDrawable;
-import com.example.gohotel.utils.Utils;
+import com.example.nhom4.R;
+import com.example.nhom4.activity.ChooseAreaActivity;
+import com.example.nhom4.activity.HotelDetailActivity;
+import com.example.nhom4.adapter.HotelMapAdapter;
+import com.example.nhom4.dialog.DialogLoadingProgress;
+import com.example.nhom4.gps.GeoCodeService;
+import com.example.nhom4.model.HotelForm;
+import com.example.nhom4.model.MarkerWrapper;
+import com.example.nhom4.nhom4Application;
+import com.example.nhom4.utils.AddressResultReceiver;
+import com.example.nhom4.utils.ParamConstants;
+import com.example.nhom4.utils.PreferenceUtils;
+import com.example.nhom4.utils.TextOnDrawable;
+import com.example.nhom4.utils.Utils;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -241,7 +242,7 @@ public class MapFragment extends Fragment {
                             mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                                 @Override
                                 public void onMapClick(LatLng latLng) {
-//                                    hideHotelForm();
+                                    hideHotelForm();
                                 }
                             });
 
@@ -258,10 +259,38 @@ public class MapFragment extends Fragment {
                                 } catch (Exception e) {
                                 }
                             });
-                            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//                            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//                                @Override
+//                                public boolean onMarkerClick(Marker marker) {
+//                                    final MarkerWrapper markerWrapper = findHotelSn(marker);
+//                                    if (markerWrapper != null) {
+//                                        HotelForm hotelForm = markerWrapper.getHotelForm();
+//                                        if (hotelForm != null) {
+////                                            showHotelForm(hotelForm.getHotelId());
+//                                            Intent intent = new Intent(context, HotelDetailActivity.class);
+//                                            intent.putExtra("hotelKey", hotelForm.getIdHotel());
+//                                            startActivity(intent);
+//                                        }
+//                                    }
+//
+//                                    return false;
+//                                }
+//                            });
+
+                            mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+
                                 @Override
-                                public boolean onMarkerClick(Marker marker) {
-                                    return false;
+                                public void onInfoWindowClick(Marker marker) {
+                                    final MarkerWrapper markerWrapper = findHotelSn(marker);
+                                    if (markerWrapper != null) {
+                                        HotelForm hotelForm = markerWrapper.getHotelForm();
+                                        if (hotelForm != null) {
+//                                            showHotelForm(hotelForm.getHotelId());
+                                            Intent intent = new Intent(context, HotelDetailActivity.class);
+                                            intent.putExtra("hotelKey", hotelForm.getIdHotel());
+                                            startActivity(intent);
+                                        }
+                                    }
                                 }
                             });
 
@@ -281,7 +310,7 @@ public class MapFragment extends Fragment {
         String longlati = PreferenceUtils.getLongLocation(context);
         DialogLoadingProgress.getInstance().show(context);
 
-        GoHotelApplication.serviceApi.getHotelMap(lat, longlati, radiusMap() / 1000).enqueue(new Callback<List<HotelForm>>() {
+        nhom4Application.serviceApi.getHotelMap(lat, longlati, radiusMap() / 1000).enqueue(new Callback<List<HotelForm>>() {
             @Override
             public void onResponse(Call<List<HotelForm>> call, Response<List<HotelForm>> response) {
                 DialogLoadingProgress.getInstance().hide();
@@ -332,6 +361,8 @@ public class MapFragment extends Fragment {
 
                                 MarkerOptions markerOptions = new MarkerOptions();
                                 markerOptions.position(latLng);
+                                markerOptions.title(hotelForm.getNameHotel());
+//                                markerOptions.snippet(price);
 //                                markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap));
 
                                 MarkerWrapper markerWrapper = new MarkerWrapper(hotelForm, mMap.addMarker(markerOptions));
@@ -394,7 +425,9 @@ public class MapFragment extends Fragment {
 
     private MarkerWrapper findHotelSn(Marker marker) {
         for (int i = 0; i < markers.size(); i++) {
-            if (marker.getId().equals(markers.get(i).getMarker().getId())) {
+            String a = marker.getTitle();
+            String b = markers.get(i).getMarker().getTitle();
+            if (marker.getTitle().equals(markers.get(i).getMarker().getTitle())) {
                 return markers.get(i);
             }
         }
@@ -419,8 +452,7 @@ public class MapFragment extends Fragment {
             price = String.valueOf(Utils.formatCurrencyK(hotelForm.getPriceRoomPerDay()));
 
         }
-        return "";
-//        return price;
+        return price;
     }
 
     public float radiusMap() {
@@ -552,7 +584,7 @@ public class MapFragment extends Fragment {
         String longlati = PreferenceUtils.getLongLocation(context);
         DialogLoadingProgress.getInstance().show(context);
 
-        GoHotelApplication.serviceApi.getHotelMap(lat, longlati, radiusMap() / 1000, city, district).enqueue(new Callback<List<HotelForm>>() {
+        nhom4Application.serviceApi.getHotelMap(lat, longlati, radiusMap() / 1000, city, district).enqueue(new Callback<List<HotelForm>>() {
             @Override
             public void onResponse(Call<List<HotelForm>> call, Response<List<HotelForm>> response) {
                 DialogLoadingProgress.getInstance().hide();
@@ -597,7 +629,7 @@ public class MapFragment extends Fragment {
         String longlati = PreferenceUtils.getLongLocation(context);
         DialogLoadingProgress.getInstance().show(context);
 
-        GoHotelApplication.serviceApi.getHotelMap(lat, longlati, radiusMap() / 1000, city).enqueue(new Callback<List<HotelForm>>() {
+        nhom4Application.serviceApi.getHotelMap(lat, longlati, radiusMap() / 1000, city).enqueue(new Callback<List<HotelForm>>() {
             @Override
             public void onResponse(Call<List<HotelForm>> call, Response<List<HotelForm>> response) {
                 DialogLoadingProgress.getInstance().hide();
