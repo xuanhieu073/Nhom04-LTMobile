@@ -15,6 +15,7 @@ import com.example.gohotel.widgets.Calendar.CellDayClickListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+<!--Create by: Khoa-->
 public class CalendarAdapter extends PagerAdapter {
     private Context context;
     private Calendar calendar, calendarSelected, minDate;

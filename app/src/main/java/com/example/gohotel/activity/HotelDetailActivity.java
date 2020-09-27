@@ -156,7 +156,7 @@ public class HotelDetailActivity extends AppCompatActivity {
             }
         });
     }
-
+// update get image
     private void getImageHotel() {
         DialogLoadingProgress.getInstance().show(this);
 

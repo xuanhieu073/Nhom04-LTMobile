@@ -59,6 +59,8 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+        
+        // kiểm tra password
         edtPassword = findViewById(R.id.edtPassword);
         edtPassword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override

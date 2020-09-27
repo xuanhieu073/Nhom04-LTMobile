@@ -59,6 +59,7 @@ public class BookingDetail extends AppCompatActivity {
     }
 	<!--Create by: Tan-->
 	<!-- Description: checkInBooking -->
+ 
     private void checkInBooking() {
         DialogLoadingProgress.getInstance().show(this);
 
@@ -83,7 +84,7 @@ public class BookingDetail extends AppCompatActivity {
             }
         });
     }
-
+    <!--Create by:Tan-->
     private void cancelBooking() {
         DialogLoadingProgress.getInstance().show(this);
 

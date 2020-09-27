@@ -3,6 +3,8 @@ package com.example.gohotel.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+<!--Create by: Tan-->
+<!--Description: HotelForm-->
 public class HotelForm {
     @SerializedName("id_hotel")
     @Expose
